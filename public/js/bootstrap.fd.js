@@ -99,7 +99,11 @@
 
             reader.onload = function (e) {
                 f.content = e.target.result;
-                loadedFiles.push(f);
+                if (options.multiple) {
+                    loadedFiles.push(f);
+                } else {
+                    loadedFiles = [f];
+                }
                 progressBar.removeClass("active");
             };
 
@@ -134,14 +138,21 @@
                 });
             row = $("<div class='row'></div>");
             row.append(progress);
-            $(".bfd-files", modal)
-                .append(row);
+            if (options.multiple) {
+                $(".bfd-files", modal).append(row);
+            } else {
+                $(".bfd-files", modal).html(row);
+            }
 
             reader["readAs" + options.readAs](f);
         };
 
         var loadFiles = function loadFiles(flist) {
-            Array.prototype.forEach.apply(flist, [loadFile]);
+            if (options.multiple) {
+                Array.prototype.forEach.apply(flist, [loadFile]);
+            } else {
+                loadFile(flist[0]);
+            }
         };
 
         // setting up event handlers
@@ -154,7 +165,8 @@
             input.replaceWith(newInput);
             input = newInput;
         });
-        // // drag&drop stuff
+
+        // drag&drop stuff
         dropfield.on("dragenter.bfd", function () {
                 dropfieldInner.addClass("bfd-dragover");
             })
@@ -197,8 +209,7 @@
             modal.remove();
         });
 
-        $(document.body)
-            .append(modal);
+        $(document.body).append(modal);
         modal.modal();
 
         return modal;
