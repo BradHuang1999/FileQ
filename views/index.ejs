@@ -1,0 +1,123 @@
+<html>
+
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/bootstrap.fd.scss">
+    <script src="/js/bootstrap.fd.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.add-file').click(function () {
+                var requestType = $(this).attr("data-method");
+                var requestURL = $(this).attr("data-url");
+                var multiple = requestType === "POST";
+
+                $.FileDialog({
+                        multiple: multiple,
+                        readAs: 'DataURL'
+                    })
+                    .on('files.bs.filedialog', function (ev) {
+                        var files = ev.files;
+
+                        files.forEach(file => {
+                            $.ajax({
+                                url: requestURL,
+                                type: requestType,
+                                data: {
+                                    content: file.content,
+                                    size: file.size,
+                                    title: file.name
+                                },
+                                success: function (data) {
+                                    console.log(data);
+                                },
+                                error: function (jqXHR, ex) {
+                                    console.debug(jqXHR.status);
+                                    console.debug(ex);
+                                }
+                            });
+                        });
+
+                        $("#output").html((files.map(file => file.name)).join(", "));
+                    })
+                    .on('cancel.bs.filedialog', function (ev) {
+                        $("#output")
+                            .html("Cancelled!");
+                    });
+            });
+
+            $('.delete-file').click(function () {
+                var requestURL = $(this).attr("data-url");
+
+                $.ajax({
+                    url: requestURL,
+                    type: 'DELETE',
+                    success: function (data) {
+                        console.log("Delete Successful.", data);
+                    },
+                    error: function (jqXHR, ex) {
+                        console.debug(jqXHR.status);
+                        console.debug(ex);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h1>FileQ</h1>
+    <br>
+    <h3>This is a temporary home for my files.</h3>
+    <br>
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">File</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+                <th scope="col">Uploaded at</th>
+                <th scope="col">Last Edited at</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% files.forEach(file => { %>
+            <tr>
+                <td>
+                    <%= file.title %>
+                </td>
+                <td>
+                    <a class="add-file" data-method="PUT" data-url="/fileQ/<%= file.id %>">Edit</a>
+                </td>
+                <td>
+                    <a class="delete-file" data-url="/fileQ/<%= file.id %>">Delete</a>
+                </td>
+                <td>
+                    <%= file.uploadTime.toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
+                </td>
+                <td>
+                    <%= file.editTime.toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <br>
+
+    <button class="btn btn-primary add-file" data-method="POST" data-url="/fileQ">
+        Enqueue a File
+    </button>
+    <label id="output"></label>
+
+</body>
+
+</html>
