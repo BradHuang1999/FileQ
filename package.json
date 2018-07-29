@@ -1,0 +1,34 @@
+{
+  "name": "fileq",
+  "version": "1.0.0",
+  "description": "A simple cloud-based, queue-structured temporary file storage system using AWS S3",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BradHuang1999/FileQ.git"
+  },
+  "keywords": [
+    "cloud",
+    "file-storage",
+    "S3",
+    "AWS"
+  ],
+  "author": "Brad Huang",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/BradHuang1999/FileQ/issues"
+  },
+  "homepage": "https://github.com/BradHuang1999/FileQ#readme",
+  "dependencies": {
+    "aws-sdk": "^2.282.1",
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "filesize": "^3.6.1",
+    "http": "0.0.0",
+    "mongoose": "^5.2.5"
+  }
+}
