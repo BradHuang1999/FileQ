@@ -36,6 +36,7 @@
                                 },
                                 success: function (data) {
                                     console.log(data);
+                                    location.reload();
                                 },
                                 error: function (jqXHR, ex) {
                                     console.debug(jqXHR.status);
@@ -47,8 +48,7 @@
                         $("#output").html((files.map(file => file.name)).join(", "));
                     })
                     .on('cancel.bs.filedialog', function (ev) {
-                        $("#output")
-                            .html("Cancelled!");
+                        $("#output").html("Cancelled!");
                     });
             });
 
@@ -59,7 +59,8 @@
                     url: requestURL,
                     type: 'DELETE',
                     success: function (data) {
-                        console.log("Delete Successful.", data);
+                        console.log(data);
+                        location.reload();
                     },
                     error: function (jqXHR, ex) {
                         console.debug(jqXHR.status);
@@ -68,6 +69,7 @@
                 });
             });
         });
+
     </script>
 </head>
 
@@ -83,6 +85,7 @@
                 <th scope="col">File</th>
                 <th scope="col">Edit</th>
                 <th scope="col">Delete</th>
+                <th scope="col">File Size</th>
                 <th scope="col">Uploaded at</th>
                 <th scope="col">Last Edited at</th>
             </tr>
@@ -92,13 +95,18 @@
             <% files.forEach(file => { %>
             <tr>
                 <td>
-                    <%= file.title %>
+                    <a href="<%= file.s3Link %>">
+                        <%= file.title %>
+                    </a>
                 </td>
                 <td>
                     <a class="add-file" data-method="PUT" data-url="/fileQ/<%= file.id %>">Edit</a>
                 </td>
                 <td>
                     <a class="delete-file" data-url="/fileQ/<%= file.id %>">Delete</a>
+                </td>
+                <td>
+                    <%= file.size %>
                 </td>
                 <td>
                     <%= file.uploadTime.toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
