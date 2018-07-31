@@ -74,9 +74,7 @@
 </head>
 
 <body>
-    <h1>FileQ</h1>
-    <br>
-    <h3>This is a temporary home for my files.</h3>
+    <h1>FileQ <font size="6">- a temporary home for my files.</font></h1>
     <br>
 
     <table class="table">
@@ -95,7 +93,7 @@
             <% files.forEach(file => { %>
             <tr>
                 <td>
-                    <a href="<%= file.s3Link %>">
+                    <a href="<%= file.s3Link %>" download="<%= file.title %>">
                         <%= file.title %>
                     </a>
                 </td>
@@ -122,9 +120,9 @@
     <br>
 
     <button class="btn btn-primary add-file" data-method="POST" data-url="/fileQ">
-        Enqueue a File
+        Add Files
     </button>
-    <label id="output"></label>
+    <label id="output" style="margin-left: 15px"></label>
 
 </body>
 
