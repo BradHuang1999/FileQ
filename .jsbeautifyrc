@@ -35,7 +35,7 @@
 
     "unescape_strings": false,
 
-    "wrap_line_length": 128,
+    "wrap_line_length": 192,
 
     "unformatted": [
         "a", "abbr", "area", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite",
