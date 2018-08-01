@@ -8,83 +8,115 @@ const filesize = require('filesize');
 const AWS = require('aws-sdk');
 
 AWS.config.update(configs.AWS.config);
-const s3 = new AWS.S3();
+const s3 = new AWS.S3({
+    params: {
+        Bucket: configs.AWS.bucketName,
+        ACL: 'public-read',
+        ContentEncoding: 'base64'
+    }
+});
+
+function s3UploadFile(content, fileModel) {
+    let fileContent = content.match(/data:(.*);base64,(.*)/);
+    return s3.upload({
+        Key: fileModel.id,
+        Body: new Buffer(fileContent[2], 'base64'),
+        ContentType: fileContent[1],
+        ContentDisposition: "attachment; filename = " + fileModel.title
+    }).promise();
+}
 
 ////// FileQ Routes //////
 router.get('/fileQ', (req, res) => {
     FileModel.find({}, (err, files) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Database error");
+        }
+
         res.render('index', { files: files });
     });
 });
 
+router.get('/fileQ/:id', (req, res) => {
+    FileModel.findById(req.params.id, 'bucket', (err, file) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Database error");
+        }
+        if (!file || !file.bucket) {
+            return res.status(404).send("File not found");
+        }
+
+        res.redirect(`//${file.bucket}.s3.amazonaws.com/${file.id}`);
+    });
+});
+
 router.post('/fileQ', (req, res) => {
-    let fileContent = req.body.content.match(/data:(.*);base64,(.*)/);
     let createBody = {
         size: filesize(req.body.size),
-        title: req.body.title
+        title: req.body.title,
+        bucket: configs.AWS.bucketName
     };
 
     FileModel.create(createBody, (err, newFile) => {
         if (err) {
             console.log(err);
-            return res.redirect('/error');
+            return res.status(500).send('Database error when creating file instance');
         }
 
-        s3.upload({
-            Bucket: configs.AWS.bucketName,
-            Key: newFile.id,
-            Body: new Buffer(fileContent[2], 'base64'),
-            ACL: 'public-read',
-            ContentEncoding: 'base64',
-            ContentType: fileContent[1]
-        }, (err, data) => {
-            if (err) return console.log(err);
-
-            newFile.set({ s3Link: data.Location });
-            newFile.save();
-            res.status(200).json({ status: "File added", fileId: newFile.id });
-        });
+        s3UploadFile(req.body.content, newFile)
+            .then(data => {
+                console.log(data);
+                res.status(200).send("File added successfully");
+            })
+            .catch(err => {
+                console.log(err);
+                return res.status(500).send('S3 error when uploading file');
+            });
     });
 });
 
 router.put('/fileQ/:id', (req, res) => {
-    var fileContent = req.body.content.match(/data:(.*);base64,(.*)/);
-    delete req.body.content;
-
-    FileModel.findById(req.params.id, (err, foundFile) => {
+    FileModel.findByIdAndUpdate(req.params.id, {
+        $set: {
+            size: filesize(req.body.size),
+            editTime: Date.now()
+        }
+    }, (err, foundFile) => {
         if (err) {
             console.log(err);
-            return res.redirect('/error');
+            return res.status(500).send('Database error when finding instance');
         }
         if (!foundFile) {
-            console.log("File", req.params.id, "not found...");
-            return res.redirect('/fileQ');
+            return res.status(404).send('File not found');
         }
 
-        s3.upload({
-            Bucket: configs.AWS.bucketName,
-            Key: foundFile.id,
-            Body: new Buffer(fileContent[2], 'base64'),
-            ACL: 'public-read',
-            ContentEncoding: 'base64',
-            ContentType: fileContent[1]
-        }, (err, data) => {
-            if (err) return console.log(err);
-
-            foundFile.set({
-                size: filesize(req.body.size),
-                editTime: Date.now()
+        s3UploadFile(req.body.content, foundFile)
+            .then(data => {
+                res.status(200).send("File edited successfully");
+            })
+            .catch(err => {
+                console.log(err);
+                return res.status(500).send('S3 error when reuploading file');
             });
-            foundFile.save();
-            res.status(200).json({ status: "Edit complete", fileId: foundFile.id });
-        });
     });
 });
 
 router.delete('/fileQ/:id', (req, res) => {
-    console.log("DELETE", req.params.id);
-    FileModel.findByIdAndRemove(req.params.id, (err) => {
-        res.status(200).json({ status: "Delete complete" });
+    s3.deleteObject({ Key: req.params.id }, function (err, data) {
+        if (err) {
+            console.log(err);
+            return res.status(500).send('S3 error when uploading file');
+        }
+
+        FileModel.findByIdAndRemove(req.params.id, (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send('Database when deleting file');
+            }
+            res.status(200).send("File deleted successfully");
+        });
     });
 });
 
