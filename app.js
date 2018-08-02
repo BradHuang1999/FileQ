@@ -22,7 +22,7 @@ mongoose.connect(configs.DB_CONNECTION, { useNewUrlParser: true });
 console.log("DB Connection Successful");
 
 ////// SET ENVIRONMENT VARIABLES //////
-app.set('port', process.env.PORT || 3001);
+app.set('port', configs.PORT || 3001);
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
