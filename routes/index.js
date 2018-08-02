@@ -67,7 +67,6 @@ router.post('/fileQ', (req, res) => {
 
         s3UploadFile(req.body.content, newFile)
             .then(data => {
-                console.log(data);
                 res.status(200).send("File added successfully");
             })
             .catch(err => {

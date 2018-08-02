@@ -82,7 +82,7 @@
         <thead class="thead-dark">
             <tr>
                 <th scope="col">File</th>
-                <th scope="col">Edit</th>
+                <th scope="col">Reupload</th>
                 <th scope="col">Delete</th>
                 <th scope="col">File Size</th>
                 <th scope="col">Uploaded at</th>
@@ -99,7 +99,7 @@
                     </a>
                 </td>
                 <td>
-                    <a class="add-file" data-method="PUT" data-url="/fileQ/<%= file.id %>">Edit</a>
+                    <a class="add-file" data-method="PUT" data-url="/fileQ/<%= file.id %>">Reupload the file</a>
                 </td>
                 <td>
                     <a class="delete-file" data-url="/fileQ/<%= file.id %>">Delete</a>
