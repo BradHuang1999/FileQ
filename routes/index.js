@@ -27,7 +27,7 @@ function s3UploadFile(content, fileModel) {
 }
 
 ////// FileQ Routes //////
-router.get('/fileQ', (req, res) => {
+router.get('/', (req, res) => {
     FileModel.find({}, (err, files) => {
         if (err) {
             console.log(err);
