@@ -94,15 +94,15 @@
             <% files.forEach(file => { %>
             <tr>
                 <td>
-                    <a href="/fileQ/<%= file.id %>">
+                    <a href="/files/<%= file.id %>">
                         <%= file.title %>
                     </a>
                 </td>
                 <td>
-                    <a class="add-file" data-method="PUT" data-url="/fileQ/<%= file.id %>">Reupload the file</a>
+                    <a class="add-file" data-method="PUT" data-url="/files/<%= file.id %>">Reupload the file</a>
                 </td>
                 <td>
-                    <a class="delete-file" data-url="/fileQ/<%= file.id %>">Delete</a>
+                    <a class="delete-file" data-url="/files/<%= file.id %>">Delete</a>
                 </td>
                 <td>
                     <%= file.size %>

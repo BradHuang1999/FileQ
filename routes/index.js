@@ -38,7 +38,7 @@ router.get('/fileQ', (req, res) => {
     });
 });
 
-router.get('/fileQ/:id', (req, res) => {
+router.get('/files/:id', (req, res) => {
     FileModel.findById(req.params.id, 'bucket', (err, file) => {
         if (err) {
             console.log(err);
@@ -52,7 +52,7 @@ router.get('/fileQ/:id', (req, res) => {
     });
 });
 
-router.post('/fileQ', (req, res) => {
+router.post('/files', (req, res) => {
     let createBody = {
         size: filesize(req.body.size),
         title: req.body.title,
@@ -76,7 +76,7 @@ router.post('/fileQ', (req, res) => {
     });
 });
 
-router.put('/fileQ/:id', (req, res) => {
+router.put('/files/:id', (req, res) => {
     FileModel.findByIdAndUpdate(req.params.id, {
         $set: {
             size: filesize(req.body.size),
@@ -102,7 +102,7 @@ router.put('/fileQ/:id', (req, res) => {
     });
 });
 
-router.delete('/fileQ/:id', (req, res) => {
+router.delete('/files/:id', (req, res) => {
     s3.deleteObject({ Key: req.params.id }, function (err, data) {
         if (err) {
             console.log(err);
