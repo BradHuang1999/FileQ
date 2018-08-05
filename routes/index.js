@@ -11,7 +11,6 @@ AWS.config.update(configs.AWS.config);
 const s3 = new AWS.S3({
     params: {
         Bucket: configs.AWS.bucketName,
-        ACL: 'public-read',
         ContentEncoding: 'base64'
     }
 });
@@ -22,7 +21,6 @@ function s3UploadFile(content, fileModel) {
         Key: fileModel.id,
         Body: new Buffer(fileContent[2], 'base64'),
         ContentType: fileContent[1],
-        ContentDisposition: "attachment; filename = " + fileModel.title
     }).promise();
 }
 
@@ -39,7 +37,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/files/:id', (req, res) => {
-    FileModel.findById(req.params.id, 'bucket', (err, file) => {
+    FileModel.findById(req.params.id, 'bucket title', (err, file) => {
         if (err) {
             console.log(err);
             return res.status(500).send("Database error");
@@ -48,7 +46,14 @@ router.get('/files/:id', (req, res) => {
             return res.status(404).send("File not found");
         }
 
-        res.redirect(`//${file.bucket}.s3.amazonaws.com/${file.id}`);
+        const url = s3.getSignedUrl('getObject', {
+            Bucket: file.bucket,
+            Key: file.id,
+            ResponseContentDisposition: "attachment; filename = " + file.title,
+            Expires: 600
+        });
+
+        res.redirect(url);
     });
 });
 
@@ -79,6 +84,7 @@ router.post('/files', (req, res) => {
 router.put('/files/:id', (req, res) => {
     FileModel.findByIdAndUpdate(req.params.id, {
         $set: {
+            title: req.body.title,
             size: filesize(req.body.size),
             editTime: Date.now()
         }
