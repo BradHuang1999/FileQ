@@ -108,10 +108,10 @@
                     <%= file.size %>
                 </td>
                 <td>
-                    <%= file.uploadTime.toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
+                    <%= new Date(file.uploadTime).toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
                 </td>
                 <td>
-                    <%= file.editTime.toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
+                    <%= new Date(file.editTime).toLocaleString("en-US", { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %>
                 </td>
             </tr>
             <% }) %>
