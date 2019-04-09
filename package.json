@@ -23,12 +23,12 @@
   },
   "homepage": "https://github.com/BradHuang1999/FileQ#readme",
   "dependencies": {
-    "aws-sdk": "^2.282.1",
+    "aws-sdk": "^2.437.0",
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
-    "express": "^4.16.3",
+    "express": "^4.16.4",
     "filesize": "^3.6.1",
     "http": "0.0.0",
-    "mongoose": "^5.2.5"
+    "mongoose": "^5.5.0"
   }
 }
